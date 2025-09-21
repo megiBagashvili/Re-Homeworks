@@ -11,4 +11,4 @@ console.log(removeLastChar(["one","two","three"]));
 function sumTwoSmallest(arr) {
   return arr.sort((a, b) => a - b).slice(0, 2).reduce((a, b) => a + b, 0);
 }
-console.log(sumTwoSmallest([19, 5, 42, 2, 77]));
+console.log(sumTwoSmallest([18, 7, 123, 12, 98]));
