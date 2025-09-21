@@ -89,9 +89,7 @@ function groupAndCountAvg(arr) {
 console.log(groupAndCountAvg([
   { name: "Ann", cls: "A", grade: 90 },
   { name: "Ben", cls: "B", grade: 75 },
-  { name: "Cara", cls: "A", grade: 80 },
-  { name: "Ben", cls: "B", grade: 85 }
-
+  { name: "Cara", cls: "A", grade: 80 }
 ]));
 
 
@@ -107,9 +105,9 @@ console.log(groupAndCountAvg([
 
 
 
-console.log(groupAndCountAvg([
-  { name: "Ann", cls: "A", grade: 90 },
-  { name: "Ben", cls: "B", grade: 75 },
-  { name: "Cara", cls: "A", grade: 80 },
-  { name: "Ben", cls: "B", grade: 85 },
-])); // { A: 85, B: 75 }
+// console.log(groupAndCountAvg([
+//   { name: "Ann", cls: "A", grade: 90 },
+//   { name: "Ben", cls: "B", grade: 75 },
+//   { name: "Cara", cls: "A", grade: 80 },
+//   { name: "Ben", cls: "B", grade: 85 },
+// ])); // { A: 85, B: 75 }
