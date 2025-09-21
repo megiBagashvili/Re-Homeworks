@@ -55,3 +55,17 @@ function calculaetSum(arr){
   return sum;
 }
 console.log(calculaetSum([1,2,3,4,5]));
+
+//Task 6
+function glueLargeWords(array){
+  let newArr = array.filter(el => el.length > 5);
+  //optional, wasn't clear from task description. uncomment if needed.
+
+  // for(let i = 0; i < newArr.length; i++){
+  //   newArr[i] = newArr[i].toUpperCase();
+  // }
+  return newArr.join("#");
+
+}
+console.log(glueLargeWords( ["cat","parrot","dog","elephant"]));
+
