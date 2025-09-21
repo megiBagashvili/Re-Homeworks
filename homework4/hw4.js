@@ -34,3 +34,16 @@ console.log(groupByCurrency([
   { amount: 50, currency: "EUR" }
 ]));
 
+//task 4
+function sumNegativesCountpositives(arr){
+  return arr.reduce((acc, curr) => {
+    if(curr > 0){
+      acc[0] += 1;
+    } else if (curr < 0){
+      acc[1] += curr;
+    }
+    return acc;
+  }, [0, 0])
+}
+
+console.log(sumNegativesCountpositives([-34, -62, 123, 99, -78]));
