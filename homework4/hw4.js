@@ -47,3 +47,11 @@ function sumNegativesCountpositives(arr){
 }
 
 console.log(sumNegativesCountpositives([-34, -62, 123, 99, -78]));
+
+//task 5
+function calculaetSum(arr){
+  let sum = 0;
+  arr.forEach(el => sum += el);
+  return sum;
+}
+console.log(calculaetSum([1,2,3,4,5]));
