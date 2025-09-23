@@ -22,3 +22,19 @@ let students = [
     { name: "Luka", score: 70 }
 ]
 console.log(declareLeaderBoard(students));
+
+//task 3
+function selectLongestNameObj(arr){
+    return arr.reduce((longest, current) =>{
+        if(current.title.length > longest.title.length){
+            return current;
+        }
+        return longest;
+    }) 
+}
+
+let movies = [
+    { title: "Up", year: 2009 }, { title: "The Lord of the Rings", year: 2001 }
+]
+
+console.log(selectLongestNameObj(movies));
