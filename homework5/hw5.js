@@ -5,7 +5,7 @@ function deleteSpecifiedParam(obj, prop) {
 }
 
 let obj = { category: 'Cake', icing: 'Chocolate', serving: 8 };
-console.log(deleteSpecifiedParam(obj, 'icing'));
+console.log(deleteSpecifiedParam(obj, 'serving'));
 
 //task 2
 function declareLeaderBoard(arr) {
@@ -34,7 +34,7 @@ function selectLongestNameObj(arr){
 }
 
 let movies = [
-    { title: "Up", year: 2009 }, { title: "The Lord of the Rings", year: 2001 }
+    { title: "Up", year: 2009 }, { title: "The Lord of the Rings", year: 2001 }, { title: "The Assassination of Jesse James by the Coward Robert Ford", year: 2010 }
 ]
 
 console.log(selectLongestNameObj(movies));
