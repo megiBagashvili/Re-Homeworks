@@ -49,7 +49,7 @@ function countAveragesForEachDep(arr) {
             prev[curr.dept].count += 1;
         }
         return prev;
-    }, { })
+    }, {})
     return Object.keys(firstObject).reduce((acc, dept) => {
         acc[dept] = firstObject[dept].total / firstObject[dept].count;
         return acc;
@@ -61,4 +61,22 @@ console.log(countAveragesForEachDep([
     { name: "Jim", age: 35, dept: "IT" },
     { name: "Jake", age: 40, dept: "Finance" },
     { name: "Jill", age: 45, dept: "HR" }
+]));
+
+//task 5
+function countWotds(arr) {
+    let count = 0;
+    let newArr = arr.reduce((acc, curr) => {
+        acc.push(curr.comment);
+        return acc;
+    }, [])
+    for (let i = 0; i < newArr.length; i++) {
+        count += newArr[i].trim().split(' ').filter(Boolean).length;
+    }
+    return count;
+}
+console.log(countWotds([
+    { id:1, comment:"Hello world" }, 
+  { id:2, comment:"This is great!" },
+  { id:3, comment:"" }
 ]));
