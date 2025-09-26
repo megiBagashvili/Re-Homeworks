@@ -24,13 +24,13 @@ let students = [
 console.log(declareLeaderBoard(students));
 
 //task 3
-function selectLongestNameObj(arr){
-    return arr.reduce((longest, current) =>{
-        if(current.title.length > longest.title.length){
+function selectLongestNameObj(arr) {
+    return arr.reduce((longest, current) => {
+        if (current.title.length > longest.title.length) {
             return current;
         }
         return longest;
-    }) 
+    })
 }
 
 let movies = [
@@ -38,3 +38,27 @@ let movies = [
 ]
 
 console.log(selectLongestNameObj(movies));
+
+//task 4
+function countAveragesForEachDep(arr) {
+    let firstObject = arr.reduce((prev, curr) => {
+        if (!prev[curr.dept]) {
+            prev[curr.dept] = { total: curr.age, count: 1 }
+        } else {
+            prev[curr.dept].total += curr.age;
+            prev[curr.dept].count += 1;
+        }
+        return prev;
+    }, { })
+    return Object.keys(firstObject).reduce((acc, dept) => {
+        acc[dept] = firstObject[dept].total / firstObject[dept].count;
+        return acc;
+    }, {});
+}
+console.log(countAveragesForEachDep([
+    { name: "John", age: 25, dept: "IT" },
+    { name: "Jane", age: 30, dept: "HR" },
+    { name: "Jim", age: 35, dept: "IT" },
+    { name: "Jake", age: 40, dept: "Finance" },
+    { name: "Jill", age: 45, dept: "HR" }
+]));
