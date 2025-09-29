@@ -18,6 +18,7 @@ console.log("5");
  * ამიტომ 3 დაიბეჭდება 4-ის შემდეგ, ხოლო 2 ყველაზე ბოლოს. 
  */
 
+
 //task 2
 console.log("1");
 setTimeout(() => console.log("2"), 0);
@@ -40,3 +41,18 @@ console.log("5");
  * პირველი ტაიმერი დაბეჭდავს 2-ს.
  * მეორე ტაიმერი დაბეჭდავს 4-ს.
  */
+
+
+//task 3
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+(async () => {
+  console.log("Start");
+  await sleep(1000);
+  console.log("1 second later");
+})();
+//Start
+// ... 
+// 1 second later
