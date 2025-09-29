@@ -17,3 +17,26 @@ console.log("5");
  * setTimeout(..., 0) უფრო ადრე სრულდება ვიდრე setTimeout(..., 100),
  * ამიტომ 3 დაიბეჭდება 4-ის შემდეგ, ხოლო 2 ყველაზე ბოლოს. 
  */
+
+//task 2
+console.log("1");
+setTimeout(() => console.log("2"), 0);
+Promise.resolve().then(() => {
+  console.log("3");
+  setTimeout(() => console.log("4"), 0);
+});
+console.log("5");
+//1,5,3,2,4
+/** 
+ * აქაც ჯერ synchronous ნაწილი შესრულდება - 1 და 5. 
+ * setTimeout(() => console.log("2"), 0) → macrotask: პირველი ტაიმერი, რომელიც ჯერ არ ეშვება.
+ * Promise.resolve().then(...) → microtask. ქოლბექი  სინქრონული კოდის დასრულების შემდეგ გაეშვება.
+ * 1-სა და 5ის შემდეგ:
+ * Microtask queue: Promise callback.
+ * Macrotask queue: პირველი ტაიმერი (console.log("2")).
+ * microtask queue უფრო მაღალი პრიორიტეტია ვიდრე macrotask queue, ამიტომ 5-ის შემდეგ დაიბეჭდება 3.
+ * promise callback ქმნის მეორე ტაიმერს, რომელიც კიდევ ერთ macrotask-ს წარმოადგენს.
+ * microtask queue ამ მომენტისთვის ცარიელია, ამიტომ იწყება macrotask queue-ს შესრულება FIFO პრინციპით.
+ * პირველი ტაიმერი დაბეჭდავს 2-ს.
+ * მეორე ტაიმერი დაბეჭდავს 4-ს.
+ */
