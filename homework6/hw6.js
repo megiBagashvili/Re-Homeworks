@@ -56,3 +56,41 @@ function sleep(ms) {
 //Start
 // ... 
 // 1 second later
+
+//task 4
+function stopWhenMatched(target) {
+  if (target < 1 || target > 20) {
+    throw new Error("Target outofbounds");
+  }
+
+  const interval = setInterval(() => {
+    const randomNum = Math.floor(Math.random() * 20) + 1;
+    console.log(randomNum);
+
+    if (randomNum === target) {
+      console.log("Matched");
+      clearInterval(interval);
+    }
+  }, 1000);
+}
+
+stopWhenMatched(13);
+
+
+
+//task 5
+function countDownToZero(start, interval) {
+  if (start < 0) {
+    throw new Error("zero or more required");
+  }
+  let current = start;
+  const timer = setInterval(() => {
+    console.log(current);
+    if (current === 0) {
+      clearInterval(timer);
+    }
+    current--;
+  }, interval);
+}
+
+countDownToZero(16, 2000);
