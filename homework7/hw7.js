@@ -50,3 +50,24 @@ fetchAvailable([
 
 
 //task 3
+async function getProductsWithPriceAbove10() {
+  try {
+    const response = await fetch("https://dummyjson.com/products");
+    if (!response.ok) {
+      throw new Error(response.status);
+    }
+    const data = await response.json();
+    const filtered = data.products.filter(product => product.price > 10);
+    return filtered;
+  } catch (error) {
+    console.error(error.message);
+    return [];
+  }
+}
+
+getProductsWithPriceAbove10().then(products => {
+  console.log(products);
+});
+
+
+
