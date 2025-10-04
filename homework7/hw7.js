@@ -69,5 +69,27 @@ getProductsWithPriceAbove10().then(products => {
   console.log(products);
 });
 
+//task 4
 
+async function getWebDevelopers() {
+  try {
+    const response = await fetch("https://dummyjson.com/users");
+    const data = await response.json();
+    const webDevs = data.users.filter(user => user.company?.title === "Web Developer");
 
+    webDevs.forEach(user => {
+      console.log({
+        firstName: user.firstName,
+        lastName: user.lastName,
+        city: user.address?.city,
+        email: user.email,
+        phone: user.phone
+      });
+    });
+
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+getWebDevelopers();
