@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fetch Car by ID — Demo</title>
+  <style>
+    body { font-family: system-ui, Arial; max-width:720px; margin:32px auto; padding:16px; }
+    label{display:block; margin-bottom:8px}
+    input[type="number"]{ padding:8px; font-size:16px; width:160px }
+    button{ padding:8px 12px; font-size:16px; margin-left:8px }
+    .card{ margin-top:20px; padding:16px; border-radius:12px; box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
+    pre{ white-space:pre-wrap; word-break:break-word }
+    .error{ color:#a00 }
+    .loader{ display:inline-block; margin-left:12px }
+  </style>
+</head>
+<body>
+  <h1>Get car info by ID</h1>
+  <p>Enter a numeric ID and press <strong>Show car</strong>. The app will request <code>https://myfakeapi.com/api/cars/&lt;ID&gt;</code></p>
+
+  <label for="carId">Car ID (numbers only)</label>
+  <div>
+    <input id="carId" type="number" inputmode="numeric" min="1" placeholder="e.g. 10" />
+    <button id="btn">Show car</button>
+    <span id="status" class="loader" aria-live="polite"></span>
+  </div>
+
+  <div id="result" class="card" aria-live="polite"></div>
+
+  <script>
+    const input = document.getElementById('carId');
+    const btn = document.getElementById('btn');
+    const result = document.getElementById('result');
+    const status = document.getElementById('status');
+
+    input.addEventListener('input', () => {
+      input.value = input.value.replace(/[^0-9]/g, '');
+      if (input.value.length > 1) input.value = input.value.replace(/^0+/, '');
+    });
+
+    async function fetchCarById(id) {
+      const url = `https://myfakeapi.com/api/cars/${encodeURIComponent(id)}`;
+      status.textContent = 'Loading...';
+      try {
+        const res = await fetch(url);
+        if (!res.ok) {
+          let message = `Car with ID ${id} not found. Please enter a correct ID.`;
+          try {
+            const json = await res.json();
+            if (json && json.message) message = json.message;
+          } catch (e) { /* ignore */ }
+          throw new Error(message);
+        }
+
+        const data = await res.json();
+        return data;
+      } catch (err) {
+        throw err;
+      } finally {
+        status.textContent = '';
+      }
+    }
+
+    function renderCar(data) {
+      result.innerHTML = '';
+      const title = document.createElement('h2');
+      title.textContent = data.vehicle ? `${data.vehicle.make} ${data.vehicle.model}` : 'Car info';
+
+      const info = document.createElement('div');
+      info.innerHTML = `
+        <p><strong>ID:</strong> ${data.id ?? '—'}</p>
+        <p><strong>Make:</strong> ${data.vehicle?.make ?? '—'}</p>
+        <p><strong>Model:</strong> ${data.vehicle?.model ?? '—'}</p>
+        <p><strong>Year:</strong> ${data.vehicle?.year ?? '—'}</p>
+        <p><strong>Color:</strong> ${data.vehicle?.color ?? '—'}</p>
+        <p><strong>VIN:</strong> ${data.vehicle?.vin ?? '—'}</p>
+      `;
+
+      const raw = document.createElement('pre');
+      raw.textContent = JSON.stringify(data, null, 2);
+
+      result.appendChild(title);
+      result.appendChild(info);
+      result.appendChild(document.createElement('hr'));
+      result.appendChild(raw);
+    }
+
+    btn.addEventListener('click', async () => {
+      const val = input.value.trim();
+      if (!val) {
+        alert('Please enter a numeric ID (e.g. 10).');
+        input.focus();
+        return;
+      }
+
+      const id = Number(val);
+      if (!Number.isInteger(id) || id < 1) {
+        alert('Please enter a valid positive integer ID.');
+        return;
+      }
+
+      try {
+        const data = await fetchCarById(id);
+        renderCar(data);
+      } catch (err) {
+        alert(err.message || 'An error occurred. Please enter a correct ID.');
+        result.innerHTML = `<p class="error">${err.message || 'Failed to fetch car data.'}</p>`;
+      }
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') btn.click();
+    });
+  </script>
+</body>
+</html>
