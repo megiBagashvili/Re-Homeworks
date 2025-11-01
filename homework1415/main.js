@@ -1,5 +1,6 @@
 const express = require('express')
 const { logger } = require('./middlewares/logger.middleware')
+
 const expenseRouter = require('./router/expense.router')
 
 const app = express()
