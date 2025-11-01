@@ -4,7 +4,7 @@ exports.getAllExpenses = async (query) => {
     const { page = 1, take = 10 } = query
     const expenses = await readFile('data/expenses.json', true)
 
-    const limit = Math.min(Number(take), 50)
+    const limit = Math.min(Number(take), 30)
     const startIndex = (Number(page) - 1) * limit
 
     const paginated = expenses.slice(startIndex, startIndex + limit)
