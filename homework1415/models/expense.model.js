@@ -24,3 +24,4 @@ const expenseSchema = new mongoose.Schema({
 const Expense = mongoose.model('Expense', expenseSchema)
 
 module.exports = Expense
+//completed task 2
