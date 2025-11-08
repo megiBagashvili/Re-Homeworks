@@ -6,6 +6,8 @@ const expenseRouter = Router()
 
 expenseRouter.get('/', ExpenseController.getAllExpenses)
 
+expenseRouter.get('/top-5', ExpenseController.getTop5Expenses);
+
 expenseRouter.post('/', validateExpense, ExpenseController.createExpense)
 
 expenseRouter.get('/:id', ExpenseController.getExpenseById)

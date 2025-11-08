@@ -1,84 +1,72 @@
-const { readFile, writeFile } = require('../utils')
+const mongoose = require('mongoose');
+const Expense = require('../models/expense.model');
 
 exports.getAllExpenses = async (query) => {
-    const { page = 1, take = 10 } = query
-    const expenses = await readFile('data/expenses.json', true)
+    const { page = 1, take = 10, category, amountFrom, amountTo } = query;
 
-    const limit = Math.min(Number(take), 30)
-    const startIndex = (Number(page) - 1) * limit
+    const limit = Math.min(Number(take), 30);
+    const skip = (Number(page) - 1) * limit;
 
-    const paginated = expenses.slice(startIndex, startIndex + limit)
-
-    return {
-        total: expenses.length,
-        page: Number(page),
-        take: limit,
-        data: paginated
-    }
+    const filter = {};
+    if (category) {
+    const categories = category.split(',').map(c => new RegExp(`^${c.trim()}$`, 'i'));
+    filter.category = { $in: categories };
 }
 
-exports.createExpense = async ({ title, amount, category }) => {
-    const expenses = await readFile('data/expenses.json', true)
-    const lastId = expenses[expenses.length - 1]?.id || 0
+    if (amountFrom || amountTo) {
+        filter.amount = {};
+        if (amountFrom) filter.amount.$gte = Number(amountFrom);
+        if (amountTo) filter.amount.$lte = Number(amountTo);
+    }
 
-    const newExpense = {
-        id: lastId + 1,
+    const total = await Expense.countDocuments(filter);
+    const data = await Expense.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
+
+    return {
+        total,
+        page: Number(page),
+        take: limit,
+        data
+    };
+};
+
+exports.createExpense = async ({ title, amount, category }) => {
+    const expense = new Expense({
         title,
         amount,
         category: category || 'General'
-    }
-
-    expenses.push(newExpense)
-    await writeFile('data/expenses.json', expenses)
-}
+    });
+    await expense.save();
+    return expense;
+};
 
 exports.getExpenseById = async ({ id }) => {
-    const expenses = await readFile('data/expenses.json', true)
-    const expense = expenses.find(e => e.id === id)
-
-    return expense
-}
+    if (!mongoose.isValidObjectId(id)) return null;
+    return await Expense.findById(id);
+};
 
 exports.updateExpenseById = async ({ id, body }) => {
-    const expenses = await readFile('data/expenses.json', true)
-    const index = expenses.findIndex(e => e.id === id)
+    if (!mongoose.isValidObjectId(id)) return null;
 
-    if (index === -1) {
-        return null
-    }
+    const updateReq = {};
+    if (body.title) updateReq.title = body.title;
+    if (body.amount) updateReq.amount = body.amount;
+    if (body.category) updateReq.category = body.category;
 
-    const updateReq = {}
-
-    if (body.title) {
-        updateReq.title = body.title
-    }
-
-    if (body.amount) {
-        updateReq.amount = body.amount
-    }
-
-    if (body.category) {
-        updateReq.category = body.category
-    }
-
-    expenses[index] = {
-        ...expenses[index],
-        ...updateReq
-    }
-
-    await writeFile('data/expenses.json', expenses)
-    return expenses[index]
-}
+    const updated = await Expense.findByIdAndUpdate(id, updateReq, { new: true });
+    return updated;
+};
 
 exports.deleteExpenseById = async ({ id }) => {
-    const expenses = await readFile('data/expenses.json', true)
-    const index = expenses.findIndex(e => e.id === id)
+    if (!mongoose.isValidObjectId(id)) return null;
+    const deleted = await Expense.findByIdAndDelete(id);
+    return !!deleted;
+};
 
-    if (index === -1) {
-        return null
-    }
-
-    expenses.splice(index, 1)
-    await writeFile('data/expenses.json', expenses)
-    return true
-}
+exports.getTop5Expenses = async () => {
+    const data = await Expense.find().sort({ amount: -1 }).limit(5);
+    return data;
+};

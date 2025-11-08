@@ -1,10 +1,19 @@
 const ExpensesService = require('../services/expense.service')
 
 exports.getAllExpenses = async (req, res) => {
-    const { page = 1, take = 10 } = req.query
-    const data = await ExpensesService.getAllExpenses({ page: Number(page), take: Number(take) })
-    res.json(data)
-}
+    const { page = 1, take = 10, category, amountFrom, amountTo } = req.query;
+
+    const data = await ExpensesService.getAllExpenses({
+        page: Number(page),
+        take: Number(take),
+        category,
+        amountFrom,
+        amountTo
+    });
+
+    res.json(data);
+};
+
 
 exports.createExpense = async (req, res) => {
     const { title, amount, category } = req.body
@@ -21,7 +30,7 @@ exports.createExpense = async (req, res) => {
 }
 
 exports.getExpenseById = async (req, res) => {
-    const id = Number(req.params.id)
+    const id = req.params.id
     const expense = await ExpensesService.getExpenseById({ id })
     if (!expense) {
         return res.status(404).json({ error: true, message: 'Expense not found' })
@@ -30,7 +39,7 @@ exports.getExpenseById = async (req, res) => {
 }
 
 exports.updateExpenseById = async (req, res) => {
-    const id = Number(req.params.id)
+    const id = req.params.id
     const { title, amount, category } = req.body
 
     if (title && typeof title !== 'string') {
@@ -60,7 +69,7 @@ exports.deleteExpenseById = async (req, res) => {
         return res.status(403).json({ error: true, message: 'Invalid secret code' })
     }
 
-    const id = Number(req.params.id)
+    const id = req.params.id
     const deleted = await ExpensesService.deleteExpenseById({ id })
 
     if (!deleted) {
@@ -68,3 +77,8 @@ exports.deleteExpenseById = async (req, res) => {
     }
     res.json({ success: true, message: 'Expense deleted successfully' })
 }
+
+exports.getTop5Expenses = async (req, res) => {
+    const data = await ExpensesService.getTop5Expenses();
+    res.json(data);
+};
