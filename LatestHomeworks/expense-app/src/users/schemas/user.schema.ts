@@ -26,6 +26,9 @@ export class User extends Document {
 
   @Prop({ default: () => new Date(new Date().setMonth(new Date().getMonth() + 1)) })
   subscriptionEndDate: Date;
+
+  @Prop({ default: true })
+  isActive: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
