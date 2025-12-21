@@ -21,6 +21,9 @@ export class User extends Document {
   @Prop({ default: 'user' })
   role: string;
 
+  @Prop({ required: true })
+  age: number;
+
   @Prop({ default: () => new Date() })
   subscriptionStartDate: Date;
 
