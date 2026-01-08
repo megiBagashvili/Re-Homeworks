@@ -6,13 +6,14 @@ import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class ProductsService {
-    create(createProductDto: any) {
-        throw new Error('Method not implemented.');
-    }
     constructor(
         @InjectModel('Product') private readonly productModel: Model<Product>,
         private readonly userService: UsersService,
     ) { }
+
+    async create(createProductDto: any) {
+        return this.productModel.create(createProductDto);
+    }
 
     async findAll(email?: string) {
         const products = await this.productModel.find().lean();
