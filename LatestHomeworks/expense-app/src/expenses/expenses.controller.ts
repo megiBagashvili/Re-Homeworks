@@ -1,13 +1,17 @@
 import { Controller, Get, Post, Body, Query } from '@nestjs/common';
 import { ExpensesService } from './expenses.service';
+import { CreateExpenseDto } from './dto/create-expense.dto';
 
 @Controller('expenses')
 export class ExpensesController {
   constructor(private readonly expensesService: ExpensesService) {}
 
   @Post()
-  async create(@Body() createExpenseDto: any) {
-    return this.expensesService.create(createExpenseDto, createExpenseDto.userId);
+  async create(@Body() createExpenseDto: CreateExpenseDto) {
+    return this.expensesService.create(
+      createExpenseDto,
+      createExpenseDto.userId,
+    );
   }
 
   @Get('statistic')
@@ -17,7 +21,7 @@ export class ExpensesController {
 
   @Get('top-spenders')
   async getTopSpenders(@Query('limit') limit: number) {
-    return this.expensesService.getTopSpenders(limit);
+    return this.expensesService.getTopSpenders(Number(limit));
   }
 
   @Get()
