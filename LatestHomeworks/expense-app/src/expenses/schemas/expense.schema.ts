@@ -19,7 +19,7 @@ export class Expense extends Document {
   price: number;
 
   @Prop()
-  totalPrice: number;
+  amount: number;
 }
 
 export const ExpenseSchema = SchemaFactory.createForClass(Expense);

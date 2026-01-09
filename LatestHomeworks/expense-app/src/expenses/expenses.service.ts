@@ -7,11 +7,15 @@ import { Expense } from './schemas/expense.schema';
 export class ExpensesService {
   constructor(
     @InjectModel('Expense') private readonly expenseModel: Model<Expense>,
-  ) {}
+  ) { }
 
   async create(dto: any, userId: string) {
-    const totalPrice = dto.price * dto.quantity;
-    const newExpense = new this.expenseModel({ ...dto, totalPrice, userId });
+    const newExpense = new this.expenseModel({
+      ...dto,
+      amount: dto.amount,
+      userId,
+    });
+
     return newExpense.save();
   }
 
@@ -24,7 +28,7 @@ export class ExpensesService {
       {
         $group: {
           _id: '$category',
-          totalAmount: { $sum: '$totalPrice' },
+          totalAmount: { $sum: '$amount' },
           itemCount: { $sum: 1 },
           expenses: { $push: '$$ROOT' },
         },
@@ -37,7 +41,7 @@ export class ExpensesService {
       {
         $group: {
           _id: '$userId',
-          totalSpent: { $sum: '$totalPrice' },
+          totalSpent: { $sum: '$amount' },
         },
       },
       { $sort: { totalSpent: -1 } },
