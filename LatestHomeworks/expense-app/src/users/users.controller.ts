@@ -1,6 +1,19 @@
-import { Controller, Get, Post, Body, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  NotFoundException,
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiTags,
   ApiOperation,
@@ -8,13 +21,14 @@ import {
   ApiOkResponse,
   ApiBadRequestResponse,
   ApiNotFoundResponse,
+  ApiConsumes,
+  ApiBody,
 } from '@nestjs/swagger';
-
 
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   @Post()
   @ApiOperation({ summary: 'Create a new user' })
@@ -67,12 +81,44 @@ export class UsersController {
       error: 'Not Found',
     },
   })
-
   async upgrade(@Body('userId') userId: string) {
     const user = await this.usersService.findById(userId);
     if (!user) throw new NotFoundException('User not found');
     const currentEnd = new Date(user.subscriptionEndDate);
-    user.subscriptionEndDate = new Date(currentEnd.setMonth(currentEnd.getMonth() + 1));
+    user.subscriptionEndDate = new Date(
+      currentEnd.setMonth(currentEnd.getMonth() + 1),
+    );
     return user.save();
+  }
+
+  @Post(':id/profile-photo')
+  @ApiOperation({ summary: 'Upload a profile photo for a user' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @ApiOkResponse({ description: 'Photo uploaded successfully' })
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadProfilePhoto(
+    @Param('id') id: string,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 2 }),
+          new FileTypeValidator({ fileType: 'image/*' }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    return this.usersService.updateProfilePhoto(id, file);
   }
 }
