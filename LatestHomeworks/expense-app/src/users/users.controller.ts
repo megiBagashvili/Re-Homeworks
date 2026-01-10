@@ -1,6 +1,20 @@
-import { Controller, Get, Post, Body, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Query,
+  NotFoundException,
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiTags,
   ApiOperation,
@@ -8,13 +22,38 @@ import {
   ApiOkResponse,
   ApiBadRequestResponse,
   ApiNotFoundResponse,
+  ApiConsumes,
+  ApiBody,
+  ApiQuery,
 } from '@nestjs/swagger';
-
 
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
+
+  @Get()
+  @ApiOperation({ summary: 'Get all users with pagination' })
+  @ApiQuery({ name: 'page', required: false, example: 1, default: 1 })
+  @ApiQuery({ name: 'take', required: false, example: 30, default: 30 })
+  @ApiOkResponse({
+    example: [
+      {
+        _id: '65f1c2a9e123456789abcd01',
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john.doe@gmail.com',
+        gender: 'm',
+        age: 25,
+        role: 'user',
+        isActive: true,
+        profilePhoto: 'https://d123.cloudfront.net/profiles/abc.jpg',
+      },
+    ],
+  })
+  async findAll(@Query('page') page: number, @Query('take') take: number) {
+    return this.usersService.findAll(Number(page), Number(take));
+  }
 
   @Post()
   @ApiOperation({ summary: 'Create a new user' })
@@ -67,12 +106,43 @@ export class UsersController {
       error: 'Not Found',
     },
   })
-
   async upgrade(@Body('userId') userId: string) {
     const user = await this.usersService.findById(userId);
-    if (!user) throw new NotFoundException('User not found');
     const currentEnd = new Date(user.subscriptionEndDate);
-    user.subscriptionEndDate = new Date(currentEnd.setMonth(currentEnd.getMonth() + 1));
+    user.subscriptionEndDate = new Date(
+      currentEnd.setMonth(currentEnd.getMonth() + 1),
+    );
     return user.save();
+  }
+
+  @Post(':id/profile-photo')
+  @ApiOperation({ summary: 'Upload a profile photo for a user' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @ApiOkResponse({ description: 'Photo uploaded successfully' })
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadProfilePhoto(
+    @Param('id') id: string,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 2 }), // 2MB
+          new FileTypeValidator({ fileType: 'image/*' }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    return this.usersService.updateProfilePhoto(id, file);
   }
 }
