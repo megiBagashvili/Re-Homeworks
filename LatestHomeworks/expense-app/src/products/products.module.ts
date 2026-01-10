@@ -4,11 +4,13 @@ import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
 import { ProductSchema } from './schemas/product.schema';
 import { UsersModule } from '../users/users.module';
+import { FilesModule } from '../common/files/files.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'Product', schema: ProductSchema }]),
-    UsersModule, 
+    UsersModule,
+    FilesModule,
   ],
   controllers: [ProductsController],
   providers: [ProductsService],
