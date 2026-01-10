@@ -11,26 +11,21 @@ export class UsersService implements OnModuleInit {
     private readonly filesService: FilesService,
   ) {}
 
+  async onModuleInit(): Promise<void> {
+    await this.runIsActiveMigration();
+  }
+
   async create(createUserDto: any): Promise<User> {
     const newUser = new this.userModel(createUserDto);
     return newUser.save();
   }
 
-  async onModuleInit(): Promise<void> {
-    await this.runIsActiveMigration();
-  }
-
-  async runIsActiveMigration(): Promise<void> {
-    const result = await this.userModel.updateMany(
-      { isActive: { $exists: false } },
-      { $set: { isActive: true } },
-    );
-
-    if (result.modifiedCount > 0) {
-      console.log(
-        `Migration: Added isActive property to ${result.modifiedCount} users.`,
-      );
-    }
+  async findAll(page = 1, take = 30): Promise<User[]> {
+    return this.userModel
+      .find()
+      .skip((page - 1) * take)
+      .limit(take)
+      .exec();
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -57,8 +52,19 @@ export class UsersService implements OnModuleInit {
     ]);
   }
 
+  async runIsActiveMigration(): Promise<void> {
+    const result = await this.userModel.updateMany(
+      { isActive: { $exists: false } },
+      { $set: { isActive: true } },
+    );
+    if (result.modifiedCount > 0) {
+      console.log(`Migration: Added isActive property to ${result.modifiedCount} users.`);
+    }
+  }
+
   async updateProfilePhoto(userId: string, file: Express.Multer.File) {
     const user = await this.findById(userId);
+
     if (user.profilePhoto) {
       try {
         await this.filesService.deleteFile(user.profilePhoto);
@@ -66,6 +72,7 @@ export class UsersService implements OnModuleInit {
         console.error('Failed to delete old photo from S3:', error);
       }
     }
+
     const photoUrl = await this.filesService.uploadFile(file, 'profiles');
     user.profilePhoto = photoUrl;
     return user.save();

@@ -4,6 +4,7 @@ import {
   Post,
   Body,
   Param,
+  Query,
   NotFoundException,
   UseInterceptors,
   UploadedFile,
@@ -23,12 +24,36 @@ import {
   ApiNotFoundResponse,
   ApiConsumes,
   ApiBody,
+  ApiQuery,
 } from '@nestjs/swagger';
 
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @Get()
+  @ApiOperation({ summary: 'Get all users with pagination' })
+  @ApiQuery({ name: 'page', required: false, example: 1, default: 1 })
+  @ApiQuery({ name: 'take', required: false, example: 30, default: 30 })
+  @ApiOkResponse({
+    example: [
+      {
+        _id: '65f1c2a9e123456789abcd01',
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john.doe@gmail.com',
+        gender: 'm',
+        age: 25,
+        role: 'user',
+        isActive: true,
+        profilePhoto: 'https://d123.cloudfront.net/profiles/abc.jpg',
+      },
+    ],
+  })
+  async findAll(@Query('page') page: number, @Query('take') take: number) {
+    return this.usersService.findAll(Number(page), Number(take));
+  }
 
   @Post()
   @ApiOperation({ summary: 'Create a new user' })
@@ -83,7 +108,6 @@ export class UsersController {
   })
   async upgrade(@Body('userId') userId: string) {
     const user = await this.usersService.findById(userId);
-    if (!user) throw new NotFoundException('User not found');
     const currentEnd = new Date(user.subscriptionEndDate);
     user.subscriptionEndDate = new Date(
       currentEnd.setMonth(currentEnd.getMonth() + 1),
@@ -112,7 +136,7 @@ export class UsersController {
     @UploadedFile(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 2 }),
+          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 2 }), // 2MB
           new FileTypeValidator({ fileType: 'image/*' }),
         ],
       }),
