@@ -17,6 +17,10 @@ export class Product extends Document {
 
   @Prop({ required: true })
   quantity: number;
+
+  @Prop({ type: [String], default: [] })
+  photos: string[];
+  
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
